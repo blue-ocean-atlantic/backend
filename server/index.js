@@ -3,6 +3,7 @@ const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const bp = require('body-parser');
+const { searchListings } = require('./db/controllers/searchListings.js');
 
 require('dotenv').config();
 
@@ -44,21 +45,11 @@ app.get('/api/imagekit', (req, res) => {
 
 /* === Page Routes === */
 
-// serve react frontend
-app.get('*', (req, res) => {
-  if (req.path.endsWith('bundle.js')) {
-    res.sendFile(
-      path.resolve(path.join(__dirname, '../client/dist'), 'bundle.js')
-    );
-  } else {
-    res.sendFile(
-      path.resolve(path.join(__dirname, '../client/dist'), 'index.html')
-    );
-  }
-});
 
-app.get('/search', (req, res) => {
-  console.log('poop');
+app.get('/results', (req, res) => {
+  const zipCode = req.query.zipCode;
+  searchListings(zipCode, res);
+  res.send();
 });
 
 /* === Server Listener === */
