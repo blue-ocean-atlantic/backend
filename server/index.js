@@ -49,7 +49,7 @@ app.get('/api/imagekit', (req, res) => {
 app.get('/results', (req, res) => {
   const zipCode = req.query.zipCode;
   searchListings(zipCode, res);
-  res.send();
+
 });
 
 /* === Server Listener === */

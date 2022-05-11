@@ -90,4 +90,4 @@ listingSchema.index({ listing_id: 1 });
 
 
 
-module.exports = mongoose.model('listings', tempSchema);
+module.exports = mongoose.model('listings', listingSchema);
