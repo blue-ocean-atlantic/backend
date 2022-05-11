@@ -37,25 +37,25 @@ const locationSchema = new mongoose.Schema({
 const listingSchema = new mongoose.Schema({
   listing_id: {
     type: Number,
-    index: true,
-    required: [true, 'please provide listing_id'],
+    index: false,
+    required: [false, 'please provide listing_id'],
   },
   created_by: { //references user_id //equivalent to 'donor_id'
     type: Number,
-    required: true
+    required: false
   },
   type: {
     type: String,
     enum: ['swap', 'favor'],
-    required: true
+    required: false
   },
   title: {
     type: String,
-    required: true
+    required: false
   },
   description: {
     type: String,
-    required: true
+    required: false
   },
   category: { // swap only
     type: String
@@ -64,17 +64,17 @@ const listingSchema = new mongoose.Schema({
     type: String
   },
   available_date: {
-    type: Date,
-    required: true
+    type: String, // this should be date?
+    required: false
   },
   images_urls: {
     type: [String]
   },
   zipcode: {
-    type: String,
+    type: Number,
     minLength: 5,
     maxLength: 5,
-    // required: true
+    // required: false
     // type: Number,
     // min: 501,
     // max: 99950,
@@ -84,7 +84,7 @@ const listingSchema = new mongoose.Schema({
   },
   ended: {
     type: Boolean,
-    required: true,
+    required: false,
     default: false
   },
   ended_time: {
@@ -92,8 +92,8 @@ const listingSchema = new mongoose.Schema({
   }
 });
 
-listingSchema.index({ listing_id: 1 });
+listingSchema.index({ listing_id: 1, zipcode: 1});
 
+const Questions = mongoose.model('listings', listingSchema);
 
-
-module.exports = mongoose.model('listings', tempSchema);
+module.exports = Questions;

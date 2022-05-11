@@ -51,4 +51,6 @@ const userSchema = new mongoose.Schema({
 });
 userSchema.index({ user_id: 1 });
 
-module.exports = mongoose.model('users', tempSchema);
+const Users = mongoose.model('users', tempSchema);;
+// module.exports = mongoose.model('users', tempSchema);
+module.exports = Users;
