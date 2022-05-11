@@ -1,7 +1,7 @@
 const { Listings, Users, Ratings } = require('../model');
 // const Users = require('../model')
 
-module.exports = async function (id) {
+module.exports = async function (user_id, title, description, type, images, available_date) {
 
 // there is no id in the database so using zip code for now
 //also remove limit afterwards
