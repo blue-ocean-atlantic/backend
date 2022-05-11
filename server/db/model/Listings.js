@@ -82,12 +82,11 @@ const listingSchema = new mongoose.Schema({
   location: {
     type: tempSchema,
   },
-  ended: {
+  completed: {
     type: Boolean,
-    required: false,
     default: false
   },
-  ended_time: {
+  completed_time: {
     type: Date
   }
 });
