@@ -5,7 +5,6 @@ const cors = require('cors');
 const bp = require('body-parser');
 const db = require('./db/index.js')
 const { searchListings,getLandingListings } = require('./db/controllers/searchListings.js');
-const {getLandingUsers} = require('./db/controllers/searchUsers.js');
 
 require('dotenv').config();
 
@@ -56,22 +55,7 @@ app.get('/results', (req, res) => {
 
 //get data from users VC and Listings VC
 app.get('/api/listings/landing', (req,res) => {
-  // let promises = [];
-  // let listingData = getLandingListings(req,res)
-  // let userData = getLandingUsers(req,res)
-  // promises.push(listingData);
-  // promises.push(userData);
-  // Promise.all(promises)
-  // .then((data) => {
-  //   let listings = data[0];
-  //   let users = data[1];
-  //     //cross reference and combine data into formatted object
-  //     //lets figure out mongo aggregation combining 2 collections on the id
-  //   let dreamData =[];
-  //   listings.forEach((listing) =>{
-  //   })
-  // })
-
+//does not deal with bad data
   let listingData = getLandingListings().then((data) => {
     console.log(data[1])
     let formattedData = [];
@@ -88,11 +72,30 @@ app.get('/api/listings/landing', (req,res) => {
       });
       res.send(formattedData);
   });
-
-  // console.log(formattedData);
-  // res.send(formattedData);
-
 })
+
+app.post('/api/listings', (req,res) => {
+const {user_id,title,description,type,images,available_date,created_date, zipcode,longitude,latitude, city} = req.body;
+
+  let newListing = {
+    id: 10101010110101,
+    created_by: user_id,
+    type,
+    title,
+    description,
+    availableDate: available_date,
+    image_urls: images,
+    created_at: created_date,
+    city,
+    zipcode,
+    geolocation: [{"longitude": longitude, "latitude": latitude}],
+    ended: false,
+    ended_time: "",
+  }
+  res.send({listing_id: newListing.id});
+});
+
+
 
 
 /* === Server Listener === */
