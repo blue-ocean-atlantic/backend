@@ -5,6 +5,8 @@ const {
   details,
   createPost,
   getLanding,
+  getUserInfo,
+  getActiveListings,
 } = require("./db/controllers");
 
 
@@ -80,6 +82,32 @@ router.post("/las", (req, res) => {
 // getLanding
 router.get("/api/listings/landing", (req, res) => {
   getLanding()
+  .then((results) => {
+    res.send(results)
+  })
+  .catch((err) => {
+    console.log('something broke while getting landing', err);
+    res.send(err);
+  })
+});
+
+// 1) getUserInfo
+router.get("/api/user", (req, res) => {
+  const { id } = req.query;
+  getUserInfo(id)
+  .then((results) => {
+    res.send(results)
+  })
+  .catch((err) => {
+    console.log('something broke while getting landing', err);
+    res.send(err);
+  })
+});
+
+// 2) getActiveListings
+router.get("/api/listings/active", (req, res) => {
+  const { donor_id } = req.query;
+  getActiveListings(donor_id)
   .then((results) => {
     res.send(results)
   })
