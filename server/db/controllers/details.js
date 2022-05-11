@@ -1,7 +1,7 @@
 const { Listings, Users, Ratings } = require('../model');
 // const Users = require('../model')
 
-module.exports = async function (id, res) {
+module.exports = async function (id) {
 
 // there is no id in the database so using zip code for now
 //also remove limit afterwards
@@ -18,10 +18,10 @@ module.exports = async function (id, res) {
     //need to find user rating somehow. no way to correlate users with ratings
     let ratings = await Ratings.find()
     console.log('the query was', op)
-    res.send(username);
+    return ratings;
   } catch(err) {
     console.log('something went wrong inside details controller: ', err.message);
-    res.send(err.message);
+    return err.message;
   }
 
 }
