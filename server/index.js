@@ -3,7 +3,7 @@ const express = require("express");
 const path = require("path");
 const cors = require("cors");
 // const bp = require('body-parser');
-const { searchListings, details, createPost } = require("./db/controllers");
+const { searchListings, details, createPost, getLanding } = require("./db/controllers");
 require("./db");
 
 require("dotenv").config();
@@ -87,10 +87,24 @@ app.post("/las", (req, res) => {
 
   createPost(user_id, title, description, type, images, available_date)
   .then((results) => {
+    console.log(results);
     req.send(results)
   })
   .catch((err) => {
     console.log('something went wrong in createPost');
+    res.send(err);
+  })
+
+});
+
+// getLanding
+app.get("/api/listings/landing", (req, res) => {
+  getLanding()
+  .then((results) => {
+    res.send(results)
+  })
+  .catch((err) => {
+    console.log('something broke while getting landing', err);
     res.send(err);
   })
 });
