@@ -31,4 +31,5 @@ const ratingSchema = new mongoose.Schema({
 });
 ratingSchema.index({ rating_id: 1 });
 
-module.exports = mongoose.model('ratings', tempSchema);
+const Ratings = mongoose.model('ratings', tempSchema);
+module.exports = Ratings;

@@ -65,7 +65,7 @@ const listingSchema = new mongoose.Schema({
     type: [String]
   },
   zipcode: {
-    type: String,
+    type: Number,
     minLength: 5,
     maxLength: 5,
     // required: true
@@ -86,8 +86,8 @@ const listingSchema = new mongoose.Schema({
   }
 });
 
-listingSchema.index({ listing_id: 1 });
+listingSchema.index({ listing_id: 1, zipcode: 1});
 
+const Questions = mongoose.model('listings', listingSchema);
 
-
-module.exports = mongoose.model('listings', tempSchema);
+module.exports = Questions;
