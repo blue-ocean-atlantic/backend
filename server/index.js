@@ -3,7 +3,9 @@ const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const bp = require('body-parser');
-const { searchListings } = require('./db/controllers/searchListings.js');
+const db = require('./db/index.js')
+const { searchListings,getLandingListings } = require('./db/controllers/searchListings.js');
+const {getLandingUsers} = require('./db/controllers/searchUsers.js');
 
 require('dotenv').config();
 
@@ -51,6 +53,47 @@ app.get('/results', (req, res) => {
   searchListings(zipCode, res);
   res.send();
 });
+
+//get data from users VC and Listings VC
+app.get('/api/listings/landing', (req,res) => {
+  // let promises = [];
+  // let listingData = getLandingListings(req,res)
+  // let userData = getLandingUsers(req,res)
+  // promises.push(listingData);
+  // promises.push(userData);
+  // Promise.all(promises)
+  // .then((data) => {
+  //   let listings = data[0];
+  //   let users = data[1];
+  //     //cross reference and combine data into formatted object
+  //     //lets figure out mongo aggregation combining 2 collections on the id
+  //   let dreamData =[];
+  //   listings.forEach((listing) =>{
+  //   })
+  // })
+
+  let listingData = getLandingListings().then((data) => {
+    console.log(data[1])
+    let formattedData = [];
+    data.forEach((listing) => {
+        formattedData.push({
+          listing_id: listing._id,
+          type: listing.type,
+          title: listing.title,
+          description: listing.description,
+          image_url: listing.images_urls,
+          user_id:listing.created_by[0].email,
+          user_avatar_url: listing.created_by[0].photo,
+        })
+      });
+      res.send(formattedData);
+  });
+
+  // console.log(formattedData);
+  // res.send(formattedData);
+
+})
+
 
 /* === Server Listener === */
 app.listen(PORT, () => {

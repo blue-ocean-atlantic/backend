@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 const db_host = process.env.DB_HOST || 'localhost';
-const db_name = process.env.DB_NAME || 'blue_ocean_db';
+const db_name = process.env.DB_NAME || 'BlueOceanDummy';
 
 mongoose.connect(`mongodb://${db_host}/${db_name}`, {
   useNewUrlParser: true,
