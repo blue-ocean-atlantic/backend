@@ -2,8 +2,9 @@
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
-const bp = require('body-parser');
-const { searchListings } = require('./db/controllers/searchListings.js');
+// const bp = require('body-parser');
+const { searchListings, details } = require('./db/controllers');
+require('./db');
 
 require('dotenv').config();
 
@@ -18,9 +19,9 @@ const PORT = process.env.PORT || 3000;
 const app = express();
 
 /* === Middleware === */
-app.use(express.json());
-app.use(bp.json());
-app.use(bp.urlencoded({ extended: true }));
+app.use(express.json({limit: 500}));
+// app.use(bp.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 // serve static files
@@ -45,11 +46,24 @@ app.get('/api/imagekit', (req, res) => {
 
 /* === Page Routes === */
 
-
+//product/map page
 app.get('/results', (req, res) => {
   const zipCode = req.query.zipCode;
   searchListings(zipCode, res);
 
+});
+
+//product/service info page
+app.get('/details', (req, res) => {
+  const id = req.query.id;
+  details(id, res);
+});
+
+//create a post page
+//is user_id supposed to be username?
+app.post('/las', (req, res) => {
+  console.log(req.body)
+  res.send();
 });
 
 /* === Server Listener === */

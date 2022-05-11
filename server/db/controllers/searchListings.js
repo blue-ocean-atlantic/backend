@@ -1,21 +1,15 @@
 const { Listings } = require('../model');
 
-const searchListings = async (zipCode, res) => {
+module.exports = async function (zipcode, res) {
 
-  const query = zipCode ? {zipCode} : {};
-
-  console.log('making query', query)
+  const query = zipcode ? {zipcode: zipcode} : {};
 
   try {
-    let results = await Listings.find({zipcode: 6204});
-    console.log(results)
+    let results = await Listings.find({zipcode}).select('-_id').limit(10);
     res.send(results);
   } catch(err) {
     console.log('something went wrong inside searchListings: ', err.message);
+    res.send(err.message);
   }
 
-}
-
-module.exports = {
-  searchListings,
 }
