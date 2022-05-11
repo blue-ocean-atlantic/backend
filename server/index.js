@@ -4,7 +4,7 @@ const path = require('path');
 const cors = require('cors');
 const bp = require('body-parser');
 const db = require('./db/index.js')
-const { searchListings,getLandingListings } = require('./db/controllers/searchListings.js');
+const { searchListings,getLandingListings, setNewListing} = require('./db/controllers/searchListings.js');
 
 require('dotenv').config();
 
@@ -92,8 +92,15 @@ const {user_id,title,description,type,images,available_date,created_date, zipcod
     ended: false,
     ended_time: "",
   }
+
+setNewListing(newListing).save()
+.then(() => {
+  console.log('listing successfully created')
   res.send({listing_id: newListing.id});
+})
+.catch((err)=> console.log(err, 'failed to create listing'));
 });
+
 
 
 

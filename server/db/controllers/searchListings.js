@@ -4,7 +4,7 @@ const searchListings = (zipCode, res) => {
   console.log('we made it fams');
 }
 
-const getLandingListings = (req,res) => {
+const getLandingListings = () => {
   // let listingData = Listings.find({}).then((data)=>{return data});
   // return listingData;
   return Listings.aggregate([
@@ -19,7 +19,12 @@ const getLandingListings = (req,res) => {
 ])
 }
 
+const setNewListing = (newListing) => {
+  return new Listings(newListing);
+}
+
 module.exports = {
   searchListings,
-  getLandingListings
+  getLandingListings,
+  setNewListing
 }
