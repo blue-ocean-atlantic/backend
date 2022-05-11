@@ -40,7 +40,7 @@ const listingSchema = new mongoose.Schema({
     index: true,
     required: [true, 'please provide listing_id'],
   },
-  created_by: { //references user_id
+  created_by: { //references user_id //equivalent to 'donor_id'
     type: Number,
     required: true
   },
@@ -56,6 +56,12 @@ const listingSchema = new mongoose.Schema({
   description: {
     type: String,
     required: true
+  },
+  category: { // swap only
+    type: String
+  },
+  condition: { // swap only
+    type: String
   },
   available_date: {
     type: Date,

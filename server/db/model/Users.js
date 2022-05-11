@@ -35,14 +35,19 @@ const userSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: true
+    required: true,
+    unique: true,
+    index: true
   },
-  bio: {
+  biography: {
     type: String
   },
   photo_url: {
     type: String
   },
+  ratings: {
+    type: [Number]
+  }
 });
 userSchema.index({ user_id: 1 });
 
