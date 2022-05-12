@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const tempSchema = new mongoose.Schema({},{strict: false});
+// const tempSchema = new mongoose.Schema({},{strict: false});
 
 const ratingSchema = new mongoose.Schema({
   rating_id: {
@@ -31,5 +31,5 @@ const ratingSchema = new mongoose.Schema({
 });
 ratingSchema.index({ rating_id: 1 });
 
-const Ratings = mongoose.model('ratings', tempSchema);
+const Ratings = mongoose.model('ratings', ratingSchema);
 module.exports = Ratings;
