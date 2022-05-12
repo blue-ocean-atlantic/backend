@@ -28,6 +28,7 @@ const ZipCodes = mongoose.model('zipcodes', schema);
 
 
 async function addDummyData () {
+  console.log('Updating the database. This may take a few mins to complete');
   try {
     await Listings.remove({});
     // await Chatroom.remove({});
