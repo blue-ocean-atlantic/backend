@@ -1,4 +1,4 @@
-const { Listings, Users } = require('../model');
+const { Listings } = require('../model');
 
 // 5) getListingDetails
 module.exports = async function (id) {
@@ -10,3 +10,5 @@ module.exports = async function (id) {
       return err.message;
     }
 }
+
+
