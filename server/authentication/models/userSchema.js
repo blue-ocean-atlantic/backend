@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
 
-// const tempSchema = new mongoose.Schema({},{strict: false});
-
 const userSchema = new mongoose.Schema({
   user_id: {
     type: Number,
@@ -30,10 +28,13 @@ const userSchema = new mongoose.Schema({
     required: true
   },
   zipcode: {
-    type: Number,
+    type: String,
     minLength: 5,
     maxLength: 5,
     required: true
+    // type: Number,
+    // min: 501,
+    // max: 99950,
   },
   email: {
     type: String,
@@ -51,7 +52,6 @@ const userSchema = new mongoose.Schema({
     type: [Number]
   }
 });
-userSchema.index({ user_id: 1 });
+const CreateUserSchema = mongoose.model('Users', userSchema);
 
-const Users = mongoose.model('users', userSchema);
-module.exports = Users;
+module.exports = CreateUserSchema;

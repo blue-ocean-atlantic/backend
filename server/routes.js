@@ -1,5 +1,6 @@
 const ImageKit = require("imagekit");
 const router = require('express').Router();
+const CreateUserSchema = require('./authentication/models/userSchema.js')
 const {
   searchListings,
   details,
@@ -11,8 +12,78 @@ const {
   getReceivedListings,
   getListingDetails,
   createUser,
+  authUser,
+  authSession,
+  authModel,
 } = require("./db/controllers");
 
+
+
+/* === Authentication Routes === */
+router.post('/api/login', async (req, res, next) => {
+  var username = req.body.username;
+  var password = req.body.password;
+  console.log('post login req', req.body.username)
+  return await authUser.get({ username })
+  .then(result => {
+    console.log('result at post login', result)
+    if (!result.length || !authUser.compare(password, result[0].password, result[0].salt)) {
+      throw new Error('UserName and password do not match');
+    } else {
+      res.cookie("userName", username)
+      res.send(result[0].username);
+    }
+  })
+  .catch(error => {
+    console.log('hi error', error);
+    res.redirect(308, '/')
+  })
+});
+
+router.post('/api/signup', (req, res, next) => {
+  const first_ame = req.body.values.firstName;
+  const last_ame = req.body.values.lastName;
+  const email = req.body.values.email;
+  const zipcode = req.body.values.zipCode;
+  const username = req.body.values.username;
+  const password = req.body.values.password;
+  //generate a listing_id and attach it to new user
+  getUserInfo()
+  .then((lastUser) => {
+    let nextId=Number(lastUser.user_id) + 1;
+    return nextId;
+  })
+  .then((nextId) => {
+    return authUser.get({username})
+    .then(result => {
+      console.log('result', result)
+      if (result[0]) {
+        console.log('email or username already exists')
+        res.write('fail')
+        res.end()
+      } else {
+        authUser.create({ first_name, last_name, email, zipcode, username, password, nextId })
+          .then(result => {
+            console.log('profile created successfully')
+            res.write('success');
+            res.end();
+          })
+          .catch(error => {
+            console.log('error at catch', error);
+          })
+      }
+    })
+    .catch(error => {
+      console.log('error caught', error);
+      res.send('error at duplicate email')
+    })
+  })
+});
+
+router.get('/api/logout', (req, res, next) => {
+  res.clearCookie('userName');
+  next();
+});
 
 /* === API Routes === */
 router.get("/api/imagekit", (req, res) => {
@@ -140,7 +211,6 @@ router.get("/api/listing", (req, res) => {
     res.send(err);
   });
 });
-
 
 // 6) getListingDetails
 
