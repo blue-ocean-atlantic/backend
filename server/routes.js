@@ -80,7 +80,7 @@ router.post('/api/signup', (req, res, next) => {
   })
 });
 
-router.get('api/logout', (req, res, next) => {
+router.get('/api/logout', (req, res, next) => {
   res.clearCookie('userName');
   next();
 });
