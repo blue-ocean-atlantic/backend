@@ -23,14 +23,13 @@ const {
 router.post('/api/login', async (req, res, next) => {
   var username = req.body.username;
   var password = req.body.password;
-  console.log('post login req', req.body.username)
   return await authUser.get({ username })
   .then(result => {
     console.log('result at post login', result)
     if (!result.length || !authUser.compare(password, result[0].password, result[0].salt)) {
-      throw new Error('UserName and password do not match');
+      throw new Error('Username and password do not match');
     } else {
-      res.cookie("userName", username)
+      res.cookie("username", username)
       res.send(result[0].username);
     }
   })
@@ -41,10 +40,10 @@ router.post('/api/login', async (req, res, next) => {
 });
 
 router.post('/api/signup', (req, res, next) => {
-  const first_ame = req.body.values.firstName;
-  const last_ame = req.body.values.lastName;
+  const first_name = req.body.values.firstName;
+  const last_name = req.body.values.lastName;
   const email = req.body.values.email;
-  const zipcode = req.body.values.zipCode;
+  const zipcode = req.body.values.zipcode;
   const username = req.body.values.username;
   const password = req.body.values.password;
   //generate a listing_id and attach it to new user
@@ -80,10 +79,24 @@ router.post('/api/signup', (req, res, next) => {
   })
 });
 
+///demo purposes
+router.get('/api/test', (req, res, next) => {
+    if (req.cookies.username === '') {
+    res.sendStatus(401);
+    console.log('TEST ROUTE: currently no username');
+  } else {
+    console.log('TEST ROUTE: current username', req.cookies.username);
+  }
+})
+
+
 router.get('/api/logout', (req, res, next) => {
-  res.clearCookie('userName');
+  res.clearCookie('username');
   next();
 });
+
+
+
 
 /* === API Routes === */
 router.get("/api/imagekit", (req, res) => {
