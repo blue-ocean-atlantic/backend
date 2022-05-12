@@ -10,7 +10,7 @@ const CreateSession = (req, res, next) => {
 
   if (!req.cookies?.userName) {
     console.log('no username in cookies')
-    req.cookies = { userName: '' };
+    req.cookies = { username: '' };
   } else {
     // console.log('userName in cookies')
     //do something with req.cookies?.userName

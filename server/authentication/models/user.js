@@ -42,6 +42,7 @@ class Users extends Model {
       password: utils.createHash(password, salt)
     };
 
+    console.log(userInput);
     let newUser = new CreateUserSchema(userInput);
     return (newUser.save());
   }

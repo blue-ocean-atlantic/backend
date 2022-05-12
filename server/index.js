@@ -11,7 +11,7 @@ const CreateSession = require('../server/authentication/middleware/auth');
 const CookiesParser = require('../server/authentication/middleware/cookieParser');
 
 /* === Server Configuration === */
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3005;
 
 /* === Instanced Modules === */
 const app = express();
