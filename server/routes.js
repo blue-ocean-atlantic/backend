@@ -17,21 +17,36 @@ const {
   authModel,
 } = require("./db/controllers");
 
-/* === API Routes === */
-router.post('/api/signup', (req, res, next) => {
-  // var firstName = req.body.values.firstName;
-  // var lastName = req.body.values.lastName;
-  // var email = req.body.values.email;
-  // var zipCode = req.body.values.zipCode;
-  // var username = req.body.values.username;
-  // var password = req.body.values.password;
 
-  var first_name = 'denis';
-  var last_name = 'tru';
-  var email = 'deasdasdt@gmail.com';
-  var zipcode = '67209';
-  var username = 'dt123121231233';
-  var password = 'passing';
+
+/* === Authentication Routes === */
+router.post('/api/login', async (req, res, next) => {
+  var username = req.body.username;
+  var password = req.body.password;
+  console.log('post login req', req.body.username)
+  return await authUser.get({ username })
+  .then(result => {
+    console.log('result at post login', result)
+    if (!result.length || !authUser.compare(password, result[0].password, result[0].salt)) {
+      throw new Error('UserName and password do not match');
+    } else {
+      res.cookie("userName", username)
+      res.send(result[0].username);
+    }
+  })
+  .catch(error => {
+    console.log('hi error', error);
+    res.redirect(308, '/')
+  })
+});
+
+router.post('/api/signup', (req, res, next) => {
+  const first_ame = req.body.values.firstName;
+  const last_ame = req.body.values.lastName;
+  const email = req.body.values.email;
+  const zipcode = req.body.values.zipCode;
+  const username = req.body.values.username;
+  const password = req.body.values.password;
   //generate a listing_id and attach it to new user
   getUserInfo()
   .then((lastUser) => {
@@ -65,6 +80,12 @@ router.post('/api/signup', (req, res, next) => {
   })
 });
 
+router.get('api/logout', (req, res, next) => {
+  res.clearCookie('userName');
+  next();
+});
+
+/* === API Routes === */
 router.get("/api/imagekit", (req, res) => {
   // Look into if this needs to have additional measures for security.
   // i.e. send only if source of request is our website?
@@ -190,7 +211,6 @@ router.get("/api/listing", (req, res) => {
     res.send(err);
   });
 });
-
 
 // 6) getListingDetails
 

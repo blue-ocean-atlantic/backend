@@ -18,8 +18,8 @@ const app = express();
 
 /* === Middleware === */
 app.use(express.json({ limit: 500 }));
-// app.use(CookiesParser);
-// app.use(CreateSession);
+app.use(CookiesParser);
+app.use(CreateSession);
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(bp.json());
