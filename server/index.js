@@ -7,6 +7,8 @@ const express = require("express");
 const path = require("path");
 const cors = require("cors");
 const bp = require('body-parser');
+const CreateSession = require('../server/authentication/middleware/auth');
+const CookiesParser = require('../server/authentication/middleware/cookieParser');
 
 /* === Server Configuration === */
 const PORT = process.env.PORT || 3000;
@@ -16,14 +18,15 @@ const app = express();
 
 /* === Middleware === */
 app.use(express.json({ limit: 500 }));
+app.use(CookiesParser);
+app.use(CreateSession);
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(bp.json());
 app.use(bp.urlencoded({ extended: true }));
 
-app.use('/', router); // this sends stuff to the router
-// serve static files
-// app.use(express.static(path.join(__dirname, "../client/dist")));
+
+app.use('/', router);
 
 /* === Server Listener === */
 app.listen(PORT, () => {

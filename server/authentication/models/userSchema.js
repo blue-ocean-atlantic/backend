@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 
-// const tempSchema = new mongoose.Schema({},{strict: false});
-
-const usersSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
   user_id: {
     type: Number,
     index: true,
@@ -30,10 +28,13 @@ const usersSchema = new mongoose.Schema({
     required: true
   },
   zipcode: {
-    type: Number,
+    type: String,
     minLength: 5,
     maxLength: 5,
     required: true
+    // type: Number,
+    // min: 501,
+    // max: 99950,
   },
   email: {
     type: String,
@@ -50,24 +51,7 @@ const usersSchema = new mongoose.Schema({
   ratings: {
     type: [Number]
   }
-}, {toJSON: {virtuals: true}});
-usersSchema.index({ user_id: 1 });
-
-usersSchema.virtual('ratingDetails', {
-  ref: 'ratings',
-  localField: 'user_id',
-  foreignField: 'rated_for',
-}).get((ratings) => {
-  let ratingsSum = 0;
-  let average = 0;
-
-  for(let i = 0; i < ratings.length; i++) {
-    ratingsSum += ratings[i].rating;
-  }
-
-  average = ratingsSum/ratings.length;
-  return {rating_average: average, ratings: ratings};
 });
+const CreateUserSchema = mongoose.model('Users', userSchema);
 
-const Users = mongoose.model('users', usersSchema);
-module.exports = Users;
+module.exports = CreateUserSchema;
