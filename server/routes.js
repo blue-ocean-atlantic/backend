@@ -10,6 +10,7 @@ const {
   getCompletedListings,
   getReceivedListings,
   getListingDetails,
+  createUser,
 } = require("./db/controllers");
 
 
@@ -58,28 +59,6 @@ router.get("/details", (req, res) => {
       console.log("ERR product/service route", err);
       res.send(err);
     });
-});
-
-//create a post page
-router.post("/las", (req, res) => {
-  const {
-    user_id,
-    title,
-    description,
-    type,
-    images,
-    available_date } = req.body;
-
-  createPost(user_id, title, description, type, images, available_date)
-  .then((results) => {
-    console.log(results);
-    req.send(results)
-  })
-  .catch((err) => {
-    console.log('something went wrong in createPost');
-    res.send(err);
-  })
-
 });
 
 // getLanding
@@ -160,6 +139,84 @@ router.get("/api/listing", (req, res) => {
     console.log('something broke while getting landing', err);
     res.send(err);
   });
+});
+
+
+// 6) getListingDetails
+
+// 7) getListingDetails
+
+// 8) createUser?
+router.post("/api/user", (req, res) => {
+  // const { id } = req.query;
+  console.log("we made it", req.body)
+  res.send();
+
+  createUser()
+  .then((results) => {
+    res.send(results)
+  })
+  .catch((err) => {
+    console.log('something broke while getting landing', err);
+    res.send(err);
+  });
+});
+
+// 9) createPost
+router.post("/las", (req, res) => {
+  const {
+    user_id,
+    title,
+    description,
+    type,
+    images,
+    available_date } = req.body;
+
+  createPost(user_id, title, description, type, images, available_date)
+  .then((results) => {
+    console.log(results);
+    req.send(results)
+  })
+  .catch((err) => {
+    console.log('something went wrong in createPost');
+    res.send(err);
+  })
+
+});
+
+// 10) ??
+router.put("/api/user", (req, res) => {
+  const { id } = req.query;
+  console.log("we made it", req.body)
+  res.send();
+  console.log('made it into 10 put')
+
+  // createUser()
+  // .then((results) => {
+  //   res.send(results)
+  // })
+  // .catch((err) => {
+  //   console.log('something broke while getting landing', err);
+  //   res.send(err);
+  // });
+});
+
+// 11) ??
+router.put("/api/listing", (req, res) => {
+  const { id } = req.query;
+  console.log("we made it", req.body)
+  res.send();
+
+  console.log('inside route 11');
+
+  // createUser()
+  // .then((results) => {
+  //   res.send(results)
+  // })
+  // .catch((err) => {
+  //   console.log('something broke while getting landing', err);
+  //   res.send(err);
+  // });
 });
 
 module.exports = router;
