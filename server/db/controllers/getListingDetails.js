@@ -1,8 +1,9 @@
-const { Listings, Users } = require('../model');
+const { Listings } = require('../model');
 
 // 5) getListingDetails
 module.exports = async function (id) {
 
+    console.log('inside get listing details')
   try {
     let listingData = await Listings.findOne({listing_id: id}).select('-_id').limit(10)
     .populate('donor', '-_id -password -__v');
