@@ -7,6 +7,9 @@ const {
   getLanding,
   getUserInfo,
   getActiveListings,
+  getCompletedListings,
+  getReceivedListings,
+  getListingDetails,
 } = require("./db/controllers");
 
 
@@ -115,6 +118,48 @@ router.get("/api/listings/active", (req, res) => {
     console.log('something broke while getting landing', err);
     res.send(err);
   })
+});
+
+// 3) getCompletedListings
+router.get("/api/listings/completed", (req, res) => {
+  const { donor_id } = req.query;
+
+  getCompletedListings(donor_id)
+  .then((results) => {
+    res.send(results)
+  })
+  .catch((err) => {
+    console.log('something broke while getting landing', err);
+    res.send(err);
+  });
+});
+
+// 4) getReceivedListings
+router.get("/api/listings/received", (req, res) => {
+  const { receiver_id } = req.query;
+
+  getReceivedListings(receiver_id)
+  .then((results) => {
+    res.send(results)
+  })
+  .catch((err) => {
+    console.log('something broke while getting landing', err);
+    res.send(err);
+  });
+});
+
+// 5) getListingDetails
+router.get("/api/listing", (req, res) => {
+  const { id } = req.query;
+
+  getListingDetails(id)
+  .then((results) => {
+    res.send(results)
+  })
+  .catch((err) => {
+    console.log('something broke while getting landing', err);
+    res.send(err);
+  });
 });
 
 module.exports = router;
