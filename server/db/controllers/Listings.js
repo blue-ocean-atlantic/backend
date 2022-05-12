@@ -8,7 +8,9 @@ const getListingsZipcode = (zipcodes) => {
   return Listings.find({zipcode: { $in: zipcodes } }).exec();
 };
 
-
+module.exports = {
+  getListings
+};
 
 
 
