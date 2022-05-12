@@ -48,7 +48,8 @@ const userSchema = new mongoose.Schema({
   },
   ratings: {
     type: [Number]
-  }
+  },
+  { timestamps: true }
 });
 userSchema.index({ user_id: 1 });
 

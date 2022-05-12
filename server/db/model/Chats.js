@@ -18,7 +18,8 @@ const chatSchema = new mongoose.Schema({
   },
   ended_time: { //is it necessary given that listing has its own end time which also functions as the time when chat ends?
     type: Date
-  }
+  },
+  { timestamps: true }
   //mongoose schemas automatically includes a createdAt timestamp which we can use for 'start time'
 });
 chatSchema.index({ chat_id: 1 });

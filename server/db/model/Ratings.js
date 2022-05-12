@@ -27,7 +27,8 @@ const ratingSchema = new mongoose.Schema({
   listing_id: {
     type: Number,
     required: true
-  }
+  },
+  { timestamps: true }
 });
 ratingSchema.index({ rating_id: 1 });
 

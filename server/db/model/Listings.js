@@ -94,7 +94,8 @@ const listingSchema = new mongoose.Schema({
   },
   completed_time: {
     type: Date
-  }
+  },
+  { timestamps: true }
 });
 
 listingSchema.index({ listing_id: 1, zipcode: 1});
