@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const tempSchema = new mongoose.Schema({},{strict: false});
+// const tempSchema = new mongoose.Schema({},{strict: false});
 
 const userSchema = new mongoose.Schema({
   user_id: {
@@ -10,7 +10,8 @@ const userSchema = new mongoose.Schema({
   },
   username: {
     type: String,
-    required: true
+    required: true,
+    unique: true
   },
   password: {
     type: String,
@@ -51,6 +52,5 @@ const userSchema = new mongoose.Schema({
 });
 userSchema.index({ user_id: 1 });
 
-const Users = mongoose.model('users', tempSchema);;
-// module.exports = mongoose.model('users', tempSchema);
+const Users = mongoose.model('users', userSchema);
 module.exports = Users;

@@ -2,23 +2,23 @@ const mongoose = require('mongoose');
 
 const zipcodeSchema = new mongoose.Schema({
   zip: {
-    type: Number,
-    min: 501,
-    max: 99950,
+    type: String,
+    minLength: 5,
+    maxLength: 5,
     unique: true,
     required: [true, 'please provide zipcode'],
+    // type: Number,
+    // min: 501,
+    // max: 99950,
   },
   type: {
-    type: String,
-    required: true
+    type: String
   },
   decommissioned: {
-    type: Number,
-    required: true
+    type: Number
   },
   primary_city: {
-    type: String,
-    required: true
+    type: String
   },
   acceptable_cities: {
     type: String
