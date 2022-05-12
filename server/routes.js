@@ -79,22 +79,22 @@ router.post('/api/signup', (req, res, next) => {
   })
 });
 
-router.get('/api/logout', (req, res, next) => {
-  res.clearCookie('username');
-  next();
-});
-
 ///demo purposes
 router.get('/api/test', (req, res, next) => {
-  console.log(req);
     if (req.cookies.username === '') {
     res.sendStatus(401);
     console.log('TEST ROUTE: currently no username');
   } else {
     console.log('TEST ROUTE: current username', req.cookies.username);
   }
-
 })
+
+
+router.get('/api/logout', (req, res, next) => {
+  res.clearCookie('username');
+  next();
+});
+
 
 
 
