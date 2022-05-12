@@ -27,9 +27,8 @@ const ratingSchema = new mongoose.Schema({
   listing_id: {
     type: Number,
     required: true
-  },
-  { timestamps: true }
-});
+  }
+}, { timestamps: true });
 ratingSchema.index({ rating_id: 1 });
 
 const Ratings = mongoose.model('ratings', ratingSchema);
