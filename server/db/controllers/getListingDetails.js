@@ -1,16 +1,15 @@
-const { Listings } = require('../model');
+const { Listings, Users } = require('../model');
 
+// 5) getListingDetails
 module.exports = async function (id) {
 
-  const query = id ? {id} : {};
-
-  console.log('getListingDetails: ', query);
-
   try {
-    let results = await Listings.find({}).select('-_id').limit(10);
-    return results;
+    let listingData = await Listings.findOne({listing_id: id}).select('-_id').limit(10)
+    .populate('donor', '-_id -password -__v');
+
+    return listingData;
   } catch(err) {
-    console.log('something went wrong inside searchListings: ', err.message);
+    console.log('something went wrong inside getListingDetails: ', err.message);
     return err.message;
   }
 

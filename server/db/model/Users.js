@@ -26,13 +26,10 @@ const userSchema = new mongoose.Schema({
     required: true
   },
   zipcode: {
-    type: String,
+    type: Number,
     minLength: 5,
     maxLength: 5,
     required: true
-    // type: Number,
-    // min: 501,
-    // max: 99950,
   },
   email: {
     type: String,
