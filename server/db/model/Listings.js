@@ -95,9 +95,15 @@ const listingSchema = new mongoose.Schema({
   completed_time: {
     type: Date
   }
-});
+}, {toJSON: {virtuals: true}});
 
 listingSchema.index({ listing_id: 1, zipcode: 1});
+
+listingSchema.virtual('donor', {
+  ref: 'users',
+  localField: 'donor_id',
+  foreignField: 'user_id',
+});
 
 const Listings = mongoose.model('listings', listingSchema);
 module.exports = Listings;
