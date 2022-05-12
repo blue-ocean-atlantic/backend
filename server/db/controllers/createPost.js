@@ -5,7 +5,7 @@ module.exports = async function (user_id, title, description, type, images, avai
 
   try {
 
-    let status = Listings.create({ user_id, title, description, type, images, available_date });
+    let status = await Listings.create({ user_id, title, description, type, images, available_date });
     return status;
   } catch(err) {
     console.log('something went wrong inside createPost controller: ', err.message);

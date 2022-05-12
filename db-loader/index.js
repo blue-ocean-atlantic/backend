@@ -4,7 +4,7 @@ const listingsData = require('./listings_mock_data.json');
 const ratingsData = require('./rating_mock_data.json');
 const usersData = require('./users_mock_data.json');
 const appointments = require('./appointments.json');
-// const zipCodes = require('../server/db/model/Zipcodes');
+const zipCodes = require('./zipcodes.json');
 const mongoose = require('mongoose');
 
 var url = 'mongodb://localhost:27017/blue_ocean_db';
@@ -24,7 +24,7 @@ const Messages = mongoose.model('chats_messages', schema);
 const Ratings = mongoose.model('ratings', schema);
 const Users = mongoose.model('users', schema);
 const Appointments = mongoose.model('appointments', schema);
-// const ZipCodes = mongoose.model('zipcodes', schema);
+const ZipCodes = mongoose.model('zipcodes', schema);
 
 
 async function addDummyData () {
@@ -35,7 +35,7 @@ async function addDummyData () {
     await Ratings.remove({});
     await Users.remove({});
     await Appointments.remove({});
-    // await ZipCodes.remove({});
+    await ZipCodes.remove({});
 
     await Listings.insertMany(listingsData);
     // await Chatroom.insertMany(chatroomData);
@@ -43,7 +43,7 @@ async function addDummyData () {
     await Ratings.insertMany(ratingsData);
     await Users.insertMany(usersData);
     await Appointments.insertMany(usersData);
-    // await ZipCodes.insertMany(zipCodes);
+    await ZipCodes.insertMany(zipCodes);
     console.log('data loading complete!');
     process.exit();
   } catch (err) {
