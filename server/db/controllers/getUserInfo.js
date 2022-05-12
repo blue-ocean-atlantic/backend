@@ -1,8 +1,6 @@
 const { Users } = require('../model');
 
 module.exports = async function (id) {
-  console.log('this is it', id)
-  // const query = zipcode ? {zipcode: zipcode} : {};
 
   if(!id) {
     try {

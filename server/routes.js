@@ -13,6 +13,7 @@ const {
   getListingDetails,
   createUser,
   authUser,
+  checkUsername,
   authSession,
   authModel,
 } = require("./db/controllers");
@@ -300,6 +301,20 @@ router.put("/api/listing", (req, res) => {
   //   console.log('something broke while getting landing', err);
   //   res.send(err);
   // });
+});
+
+// 12) checkUsername
+router.get("/api/username", (req, res) => {
+  const { username } = req.query;
+
+  checkUsername(username)
+  .then((results) => {
+    res.send(results)
+  })
+  .catch((err) => {
+    console.log('something broke while getting landing', err);
+    res.send(err);
+  });
 });
 
 module.exports = router;
