@@ -1,5 +1,6 @@
 const ImageKit = require("imagekit");
 const router = require('express').Router();
+const CreateUserSchema = require('./authentication/models/userSchema.js')
 const {
   searchListings,
   details,
@@ -11,10 +12,59 @@ const {
   getReceivedListings,
   getListingDetails,
   createUser,
+  authUser,
+  authSession,
+  authModel,
 } = require("./db/controllers");
 
-
 /* === API Routes === */
+router.post('/api/signup', (req, res, next) => {
+  // var firstName = req.body.values.firstName;
+  // var lastName = req.body.values.lastName;
+  // var email = req.body.values.email;
+  // var zipCode = req.body.values.zipCode;
+  // var username = req.body.values.username;
+  // var password = req.body.values.password;
+
+  var first_name = 'denis';
+  var last_name = 'tru';
+  var email = 'deasdasdt@gmail.com';
+  var zipcode = '67209';
+  var username = 'dt123121231233';
+  var password = 'passing';
+  //generate a listing_id and attach it to new user
+  getUserInfo()
+  .then((lastUser) => {
+    let nextId=Number(lastUser.user_id) + 1;
+    return nextId;
+  })
+  .then((nextId) => {
+    return authUser.get({username})
+    .then(result => {
+      console.log('result', result)
+      if (result[0]) {
+        console.log('email or username already exists')
+        res.write('fail')
+        res.end()
+      } else {
+        authUser.create({ first_name, last_name, email, zipcode, username, password, nextId })
+          .then(result => {
+            console.log('profile created successfully')
+            res.write('success');
+            res.end();
+          })
+          .catch(error => {
+            console.log('error at catch', error);
+          })
+      }
+    })
+    .catch(error => {
+      console.log('error caught', error);
+      res.send('error at duplicate email')
+    })
+  })
+});
+
 router.get("/api/imagekit", (req, res) => {
   // Look into if this needs to have additional measures for security.
   // i.e. send only if source of request is our website?

@@ -78,9 +78,6 @@ const listingSchema = new mongoose.Schema({
     minLength: 5,
     maxLength: 5,
     required: true
-    // type: Number,
-    // min: 501,
-    // max: 99950,
   },
   longitute: {
     type: Number
