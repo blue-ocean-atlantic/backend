@@ -1,5 +1,6 @@
 const ImageKit = require("imagekit");
 const router = require('express').Router();
+const CreateUserSchema = require('./authentication/models/userSchema.js')
 const {
   searchListings,
   details,
@@ -11,7 +12,90 @@ const {
   getReceivedListings,
   getListingDetails,
   createUser,
+  authUser,
+  authSession,
+  authModel,
 } = require("./db/controllers");
+
+
+
+/* === Authentication Routes === */
+router.post('/api/login', async (req, res, next) => {
+  var username = req.body.username;
+  var password = req.body.password;
+  return await authUser.get({ username })
+  .then(result => {
+    console.log('result at post login', result)
+    if (!result.length || !authUser.compare(password, result[0].password, result[0].salt)) {
+      throw new Error('Username and password do not match');
+    } else {
+      res.cookie("username", username)
+      res.send(result[0].username);
+    }
+  })
+  .catch(error => {
+    console.log('hi error', error);
+    res.redirect(308, '/')
+  })
+});
+
+router.post('/api/signup', (req, res, next) => {
+  const first_name = req.body.values.firstName;
+  const last_name = req.body.values.lastName;
+  const email = req.body.values.email;
+  const zipcode = req.body.values.zipcode;
+  const username = req.body.values.username;
+  const password = req.body.values.password;
+  //generate a listing_id and attach it to new user
+  getUserInfo()
+  .then((lastUser) => {
+    let nextId=Number(lastUser.user_id) + 1;
+    return nextId;
+  })
+  .then((nextId) => {
+    return authUser.get({username})
+    .then(result => {
+      console.log('result', result)
+      if (result[0]) {
+        console.log('email or username already exists')
+        res.write('fail')
+        res.end()
+      } else {
+        authUser.create({ first_name, last_name, email, zipcode, username, password, nextId })
+          .then(result => {
+            console.log('profile created successfully')
+            res.write('success');
+            res.end();
+          })
+          .catch(error => {
+            console.log('error at catch', error);
+          })
+      }
+    })
+    .catch(error => {
+      console.log('error caught', error);
+      res.send('error at duplicate email')
+    })
+  })
+});
+
+///demo purposes
+router.get('/api/test', (req, res, next) => {
+    if (req.cookies.username === '') {
+    res.sendStatus(401);
+    console.log('TEST ROUTE: currently no username');
+  } else {
+    console.log('TEST ROUTE: current username', req.cookies.username);
+  }
+})
+
+
+router.get('/api/logout', (req, res, next) => {
+  res.clearCookie('username');
+  next();
+});
+
+
 
 
 /* === API Routes === */
@@ -140,7 +224,6 @@ router.get("/api/listing", (req, res) => {
     res.send(err);
   });
 });
-
 
 // 6) getListingDetails
 

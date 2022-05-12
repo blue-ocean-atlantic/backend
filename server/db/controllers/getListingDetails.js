@@ -2,6 +2,7 @@ const { Listings } = require('../model');
 
 // 5) getListingDetails
 module.exports = async function (id) {
+<<<<<<< HEAD
 
     console.log('inside get listing details')
   try {
@@ -14,4 +15,13 @@ module.exports = async function (id) {
     return err.message;
   }
 
+=======
+    try {
+      let results = await Listings.find({}).select('-_id').limit(10);
+      return results;
+    } catch(err) {
+      console.log('something went wrong inside searchListings: ', err.message);
+      return err.message;
+    }
+>>>>>>> main
 }
