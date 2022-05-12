@@ -45,7 +45,7 @@ const listingSchema = new mongoose.Schema({
     required: true
   },
   receiver_id: { //references user_id //the receiver of the listing // only updated by donor when they mark the listing as completed.
-    type: Number
+    type: Number,
   },
   type: {
     type: String,
@@ -87,7 +87,7 @@ const listingSchema = new mongoose.Schema({
   },
   latitude: {
     type: Number
-  }
+  },
   completed: {
     type: Boolean,
     default: false

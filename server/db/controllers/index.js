@@ -7,6 +7,7 @@ const getActiveListings = require('./getActiveListings');
 const getCompletedListings = require('./getCompletedListings');
 const getReceivedListings = require('./getReceivedListings');
 const getListingDetails = require('./getListingDetails');
+const createUser = require('./createUser');
 
 module.exports = {
   searchListings,
@@ -18,4 +19,5 @@ module.exports = {
   getCompletedListings,
   getReceivedListings,
   getListingDetails,
+  createUser,
 }
