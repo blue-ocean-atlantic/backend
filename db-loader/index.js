@@ -6,6 +6,10 @@ const usersData = require('./users_mock_data.json');
 const appointmentsData = require('./appointments.json');
 const zipcodesData = require('./zipcodes.json');
 
+const TXratingsData = require('./tx_ratings_mock_data.json');
+const TXusersData = require('./tx_users_mock_data.json');
+const TXlistingsData = require('./tx_listings_mock_data.json');
+
 const {
   Users,
   Listings,
@@ -54,9 +58,21 @@ async function addDummyData () {
     await Appointments.insertMany(appointmentsData);
     await Zipcodes.insertMany(zipcodesData);
 
+    await Users.insertMany(TXusersData);
+    await Listings.insertMany(TXlistingsData);
+    await Ratings.insertMany(TXratingsData);
+
     const userRatings = {};
 
     ratingsData.forEach((rating) => {
+      if (userRatings[rating.rated_for]) {
+        userRatings[rating.rated_for].push(rating.rating);
+      } else {
+        userRatings[rating.rated_for] = [rating.rating];
+      }
+    });
+
+    TXratingsData.forEach((rating) => {
       if (userRatings[rating.rated_for]) {
         userRatings[rating.rated_for].push(rating.rating);
       } else {
