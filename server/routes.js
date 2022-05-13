@@ -18,7 +18,7 @@ const {
   authModel,
 } = require("./db/controllers");
 const { getAllZipcodesAndGeolocations, getLongAndLatFrom } = require('./db/controllers/Zipcodes');
-const { getListings } = require('./db/controllers/Listings');
+const { getListings, getListingsAndDonors } = require('./db/controllers/Listings');
 const { calculateDistance } = require('./utils');
 
 
@@ -230,77 +230,88 @@ router.get("/api/listing", (req, res) => {
 });
 
 // 6) getListings
-router.get("/api/listings", (req, res) => {
-  const { zipcode, latitude, longitude, radius, count } = req.query;
+router.get("/api/listings", async function (req, res) {
+  const { zipcode } = req.query;
+  let { query, longitude, latitude, radius, count } = req.query;
 
-  // if (!zipcode) {
-  //   res.json([]);
-  // }
+  if (!zipcode) {
+    res.json([]);
+  }
 
-  // if (!latitude && !longitude) {
-  //   getLongAndLatFrom(zipcode)
-  //   .then((response) => {
-  //     console.log(response);
-  //     latitude = response.latitude;
-  //     longitude = response.longitude;
-  //   })
-  //   .catch((error) => {
-  //     console.log(`/api/listings get longitude and latitude error: ${error}`);
-  //     res.sendStatus(500).json(error);
-  //   });
-  // }
+  const start = Date.now();
 
-  // radius = radius ? radius : 5;
-  // count = count ? count : 10;
+  if (!latitude && !longitude) {
+    try {
+      let response =  await getLongAndLatFrom(zipcode);
+      latitude = response.latitude;
+      longitude = response.longitude;
+    } catch(error) {
+      console.log(`/api/listings get longitude and latitude error: ${error}`);
+      res.sendStatus(500).json(error);
+    };
+  }
 
-  // let nearbyZipcodes = [];
+  radius = radius || 5;
+  count = count || 10;
+  query = query || '';
 
-  // // const start = Date.now();
+  const nearbyZipcodes = [];
+  const nearbyZipcodesDistances = {};
 
-  // getAllZipcodesAndGeolocations()
-  // .then((zipcodes) => {
-  //   zipcodes.forEach((zipcode) => {
-  //     if (calculateDistance(latitude, longitude, zipcode.latitude, zipcode.longitude) < limit) {
-  //       nearbyZipcodes.push(zipcode.zip);
-  //     }
-  //   });
+  try {
+    const allZipCodes = await getAllZipcodesAndGeolocations();
 
-  //   // const duration = Date.now() - start;
+    allZipCodes.forEach((zipcode) => {
+      let distance = calculateDistance(latitude, longitude, zipcode.latitude, zipcode.longitude);
+      if ( distance < radius) {
+        nearbyZipcodes.push(zipcode.zip);
+        nearbyZipcodesDistances[zipcode.zip] = distance;
+      }
+    });
+  } catch(error) {
+    console.log(`/api/listings find nearby zipcodes error: ${error}`);
+    res.sendStatus(500).json(error);
+  };
 
-  //   // console.log('nearby zipcodes calculations completed');
-  //   // console.log(nearbyZipcodes);
-  //   // console.log(nearbyZipcodes.length);
-  //   // console.log(duration);
-  // })
-  // .catch((error) => {
-  //   console.log(`/api/listings find nearby zipcodes error: ${error}`);
-  //   res.sendStatus(500).json(error);
-  // });
+  const returnListings = [];
+  const listingFields = 'listing_id type title description images_urls zipcode latitude longitude donor_id -_id'
+  const donorOptions = 'user_id email photo_url -_id';
 
-
-  const results = [];
-
-  // zipcodes = ["92648", "95128"]
-
-  // getListings({ zipcode: { $in: zipcodes } })
-  getListings({ donor_id: { $lte : 20 } })
+  getListingsAndDonors({
+    $and:
+    [ { $or: //search by query string
+        [ { title: { $regex: query, $options: 'i' } }, { description: { $regex: query, $options: 'i' } }]
+      },
+      { zipcode: { $in: nearbyZipcodes }
+    }] }, listingFields, donorOptions)
   .then((listings) => {
 
-    console.log(listings);
-    // console.log(listings.toObject({ virtuals: true }));
-    // console.log(listings.toJSON({ virtuals: true }));
+    listings.forEach((listing) => {
 
-    res.json(listings);
+      listing = listing.toObject();
 
-    // const duration = Date.now() - start;
+      listing.image_url = listing.images_urls.length > 0 ? listing.images_urls[0] : '';
+      listing.donor_email = listing.donor[0].email;
+      listing.donor_avatar_url = listing.donor[0].photo_url;
+      listing.distance = nearbyZipcodesDistances[listing.zipcode];
 
-    // console.log('nearby zipcodes calculations completed');
-    // console.log(nearbyZipcodes);
-    // console.log(nearbyZipcodes.length);
-    // console.log(duration);
+      delete listing.images_urls;
+      delete listing.donor;
+      delete listing.id;
+
+      returnListings.push(listing);
+    });
+
+    //sort by distance from closest to furthest
+    returnListings.sort((a, b) => a.distance - b.distance);
+
+    const duration = Date.now() - start;
+    console.log(`/api/listings duration = ${duration}ms`);
+
+    res.json(returnListings.slice(0, count));
   })
   .catch((error) => {
-    console.log(`/api/listings find nearby zipcodes error: ${error}`);
+    console.log(`/api/listings get listings and their donors error: ${error}`);
     res.sendStatus(500).json(error);
   });
 
