@@ -18,7 +18,7 @@ const {
   authModel,
 } = require("./db/controllers");
 const { getAllZipcodesAndGeolocations, getLongAndLatFrom } = require('./db/controllers/Zipcodes');
-const { getListings, getListingsAndDonors } = require('./db/controllers/Listings');
+const { getListings, getListingsAndDonors, createNewListing, getNextListingId } = require('./db/controllers/Listings');
 const { createNewUser, getNextUserId } = require('./db/controllers/Users');
 const { calculateDistance } = require('./utils');
 
@@ -354,25 +354,60 @@ router.post("/api/user", (req, res) => {
   });
 });
 
-// 9) createPost
-router.post("/las", (req, res) => {
+// 9) create a new listing
+router.post("/api/listing", async function (req, res) {
   const {
-    user_id,
+    donor_id,
+    type,
     title,
     description,
-    type,
-    images,
-    available_date } = req.body;
+    available_date,
+    zipcode
+  } = req.body;
+  let { images_urls, category, condition, longitude, latitude } = req.body;
 
-  createPost(user_id, title, description, type, images, available_date)
-  .then((results) => {
-    console.log(results);
-    req.send(results)
+  category = category || '';
+  condition = condition || '';
+  images_urls = images_urls || [];
+
+  if (!latitude && !longitude) {
+    try {
+      let response =  await getLongAndLatFrom(zipcode);
+      latitude = response.latitude;
+      longitude = response.longitude;
+    } catch(error) {
+      console.log(`POST /api/listing get longitude and latitude error: ${error}`);
+      res.sendStatus(500).json(error);
+    };
+  }
+
+  const newListingParams = {
+    donor_id,
+    type,
+    title,
+    description,
+    available_date,
+    images_urls,
+    zipcode,
+    longitude,
+    latitude,
+    category,
+    condition
+  };
+
+  getNextListingId()
+  .then((result) => {
+    let listing_id = result.listing_id || 0;
+    newListingParams.listing_id = listing_id + 1;
+    return createNewListing(newListingParams);
   })
-  .catch((err) => {
-    console.log('something went wrong in createPost');
-    res.send(err);
+  .then((result) => {
+    res.json(result);
   })
+  .catch((error) => {
+    console.log(`Error creating a new listing at express app: ${error}`);
+    res.sendStatus(500).json(error);
+  });
 
 });
 

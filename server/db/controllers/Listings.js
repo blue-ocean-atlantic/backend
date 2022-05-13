@@ -4,17 +4,23 @@ const getListings = (params, options = '-_id -__v', limit = 10) => {
   return Listings.find(params, options).limit(limit).exec();
 };
 
-const getListingsZipcode = (zipcodes) => {
-  return Listings.find({zipcode: { $in: zipcodes } }).exec();
-};
-
 const getListingsAndDonors = (params, options = '-_id -__v', donorOptions = 'user_id email photo_url -_id') => {
   return Listings.find(params, options).populate('donor', donorOptions).exec();
 };
 
+const createNewListing = (params) => {
+  return Listings.create(params);
+};
+
+const getNextListingId = () => {
+  return Listings.findOne({}, 'listing_id').sort({listing_id: -1}).exec();
+}
+
 module.exports = {
   getListings,
-  getListingsAndDonors
+  getListingsAndDonors,
+  createNewListing,
+  getNextListingId
 };
 
 
