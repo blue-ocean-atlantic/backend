@@ -18,8 +18,8 @@ const {
   authModel,
 } = require("./db/controllers");
 const { getAllZipcodesAndGeolocations, getLongAndLatFrom } = require('./db/controllers/Zipcodes');
-const { getListings, getListingsAndDonors, createNewListing, getNextListingId } = require('./db/controllers/Listings');
-const { createNewUser, getNextUserId } = require('./db/controllers/Users');
+const { getListings, getListingsAndDonors, createNewListing, getNextListingId, updateListing } = require('./db/controllers/Listings');
+const { createNewUser, getNextUserId, updateUser } = require('./db/controllers/Users');
 const { calculateDistance } = require('./utils');
 
 
@@ -247,7 +247,7 @@ router.get("/api/listings", async function (req, res) {
       longitude = response.longitude;
     } catch(error) {
       console.log(`/api/listings get longitude and latitude error: ${error}`);
-      res.sendStatus(500).json(error);
+      res.status(500).json(error);
     };
   }
 
@@ -270,7 +270,7 @@ router.get("/api/listings", async function (req, res) {
     });
   } catch(error) {
     console.log(`/api/listings find nearby zipcodes error: ${error}`);
-    res.sendStatus(500).json(error);
+    res.status(500).json(error);
   };
 
   const returnListings = [];
@@ -312,7 +312,7 @@ router.get("/api/listings", async function (req, res) {
   })
   .catch((error) => {
     console.log(`/api/listings get listings and their donors error: ${error}`);
-    res.sendStatus(500).json(error);
+    res.status(500).json(error);
   });
 
 });
@@ -346,11 +346,11 @@ router.post("/api/user", (req, res) => {
     return createNewUser(newUserParams);
   })
   .then((result) => {
-    res.json(result);
+    res.status(201).json(result);
   })
   .catch((error) => {
     console.log(`Error creating a new user at express app: ${error}`);
-    res.sendStatus(500).json(error);
+    res.status(500).json(error);
   });
 });
 
@@ -377,7 +377,7 @@ router.post("/api/listing", async function (req, res) {
       longitude = response.longitude;
     } catch(error) {
       console.log(`POST /api/listing get longitude and latitude error: ${error}`);
-      res.sendStatus(500).json(error);
+      res.status(500).json(error);
     };
   }
 
@@ -402,51 +402,65 @@ router.post("/api/listing", async function (req, res) {
     return createNewListing(newListingParams);
   })
   .then((result) => {
-    res.json(result);
+    res.status(201).json(result);
   })
   .catch((error) => {
     console.log(`Error creating a new listing at express app: ${error}`);
-    res.sendStatus(500).json(error);
+    res.status(500).json(error);
   });
 
 });
 
-// 10) ??
-router.put("/api/user", (req, res) => {
-  const { id } = req.query;
-  console.log("we made it", req.body)
-  res.send();
-  console.log('made it into 10 put')
+// 10) update user
+router.put("/api/user/:user_id", (req, res) => {
+  const { user_id } = req.params;
 
-  // createUser()
-  // .then((results) => {
-  //   res.send(results)
-  // })
-  // .catch((err) => {
-  //   console.log('something broke while getting landing', err);
-  //   res.send(err);
-  // });
+  updateUser(user_id, req.body)
+  .then((result) => {
+    res.json(result);
+  })
+  .catch((error) => {
+    console.log(`Error updating user (id: ${user_id} ) at express app: ${error}`);
+    res.status(500).json(error);
+  });
 });
 
-// 11) ??
-router.put("/api/listing", (req, res) => {
-  const { id } = req.query;
-  console.log("we made it", req.body)
-  res.send();
+// 11) update listing
+router.put("/api/listing/:listing_id", (req, res) => {
+  const { listing_id } = req.params;
 
-  console.log('inside route 11');
-
-  // createUser()
-  // .then((results) => {
-  //   res.send(results)
-  // })
-  // .catch((err) => {
-  //   console.log('something broke while getting landing', err);
-  //   res.send(err);
-  // });
+  updateListing(listing_id, req.body)
+  .then((result) => {
+    res.json(result);
+  })
+  .catch((error) => {
+    console.log(`Error updating listing (id: ${listing_id} ) at express app: ${error}`);
+    res.status(500).json(error);
+  });
 });
 
-// 12) checkUsername
+// 12) mark listing as completed
+router.put("/api/listing/:listing_id/completed", (req, res) => {
+  const { listing_id } = req.params;
+  const { receiver_id, completed_time } = req.body;
+
+  if (!receiver_id || !completed_time) {
+    res.status(500).json('Error: Listing cannot be marked as complete. Missing/invalid parameter(s).');
+  }
+
+  let updateParams = { receiver_id, completed_time, completed: true };
+
+  updateListing(listing_id, updateParams)
+  .then((result) => {
+    res.json(result);
+  })
+  .catch((error) => {
+    console.log(`Error updating listing (id: ${listing_id} ) at express app: ${error}`);
+    res.status(500).json(error);
+  });
+});
+
+// 13) checkUsername
 router.get("/api/username", (req, res) => {
   const { username } = req.query;
 

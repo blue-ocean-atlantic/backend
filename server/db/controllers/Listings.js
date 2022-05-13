@@ -16,11 +16,16 @@ const getNextListingId = () => {
   return Listings.findOne({}, 'listing_id').sort({listing_id: -1}).exec();
 }
 
+const updateListing = (listing_id, updateParams) => {
+  return Listings.findOneAndUpdate({listing_id}, updateParams).exec();
+};
+
 module.exports = {
   getListings,
   getListingsAndDonors,
   createNewListing,
-  getNextListingId
+  getNextListingId,
+  updateListing
 };
 
 
