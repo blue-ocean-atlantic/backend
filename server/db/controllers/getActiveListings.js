@@ -2,10 +2,8 @@ const { Listings } = require('../model');
 
 module.exports = async function (donor_id) {
 
-  const query = donor_id ? {donor_id} : {};
-
   try {
-    let results = await Listings.find({zipcode}).select('-_id').limit(10);
+    let results = await Listings.find({donor_id: donor_id, completed: false}).select('listing_id title description image_urls').limit(20);
     return results;
   } catch(err) {
     console.log('something went wrong inside searchListings: ', err.message);
