@@ -19,8 +19,8 @@ const {
 } = require("./db/controllers");
 const { getAllZipcodesAndGeolocations, getLongAndLatFrom } = require('./db/controllers/Zipcodes');
 const { getListings, getListingsAndDonors } = require('./db/controllers/Listings');
+const { createNewUser, getNextUserId } = require('./db/controllers/Users');
 const { calculateDistance } = require('./utils');
-
 
 
 /* === Authentication Routes === */
@@ -319,19 +319,38 @@ router.get("/api/listings", async function (req, res) {
 
 // 7) get latitude and longitude from zipcode
 
-// 8) createUser?
+// 8) create a new user
 router.post("/api/user", (req, res) => {
-  // const { id } = req.query;
-  // console.log("we made it", req.body)
-  // res.send();
+  const {
+    first_name,
+    last_name,
+    username,
+    password,
+    email,
+    zipcode
+  } = req.body;
 
-  createUser()
-  .then((results) => {
-    res.send(results)
+  const newUserParams = {
+    first_name,
+    last_name,
+    username,
+    password,
+    email,
+    zipcode
+  };
+
+  getNextUserId()
+  .then((result) => {
+    let user_id = result.user_id || 0;
+    newUserParams.user_id = user_id + 1;
+    return createNewUser(newUserParams);
   })
-  .catch((err) => {
-    console.log('something broke while getting landing', err);
-    res.send(err);
+  .then((result) => {
+    res.json(result);
+  })
+  .catch((error) => {
+    console.log(`Error creating a new user at express app: ${error}`);
+    res.sendStatus(500).json(error);
   });
 });
 

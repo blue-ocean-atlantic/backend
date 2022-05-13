@@ -17,7 +17,6 @@ const usersSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-
   salt: {
     type: String,
   },
@@ -30,7 +29,7 @@ const usersSchema = new mongoose.Schema({
     required: true
   },
   zipcode: {
-    type: Number,
+    type: String,
     minLength: 5,
     maxLength: 5,
     required: true
