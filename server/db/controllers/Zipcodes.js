@@ -8,10 +8,15 @@ const getAllZipcodesAndGeolocations = () => {
   return Zipcodes.find({}, 'zip latitude longitude').exec();
 };
 
+const getLongAndLatFrom = (zip) => {
+  return Zipcodes.findOne({zip}, 'latitude longitude').exec();
+};
+
 const getZipcodesByState = (state) => {
   return Zipcodes.find({state}).exec();
 };
 
 module.exports = {
-  getAllZipcodesAndGeolocations
+  getAllZipcodesAndGeolocations,
+  getLongAndLatFrom
 };

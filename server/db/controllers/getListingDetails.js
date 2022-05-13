@@ -1,6 +1,5 @@
 const { Listings } = require('../model');
 
-// 5) getListingDetails
 module.exports = async function (id) {
 
     try {

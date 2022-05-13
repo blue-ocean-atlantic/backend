@@ -17,6 +17,9 @@ const {
   authSession,
   authModel,
 } = require("./db/controllers");
+const { getAllZipcodesAndGeolocations, getLongAndLatFrom } = require('./db/controllers/Zipcodes');
+const { getListings } = require('./db/controllers/Listings');
+const { calculateDistance } = require('./utils');
 
 
 
@@ -226,15 +229,90 @@ router.get("/api/listing", (req, res) => {
   });
 });
 
-// 6) getListingDetails
+// 6) getListings
+router.get("/api/listings", (req, res) => {
+  const { zipcode, latitude, longitude, radius, count } = req.query;
 
-// 7) getListingDetails
+  // if (!zipcode) {
+  //   res.json([]);
+  // }
+
+  // if (!latitude && !longitude) {
+  //   getLongAndLatFrom(zipcode)
+  //   .then((response) => {
+  //     console.log(response);
+  //     latitude = response.latitude;
+  //     longitude = response.longitude;
+  //   })
+  //   .catch((error) => {
+  //     console.log(`/api/listings get longitude and latitude error: ${error}`);
+  //     res.sendStatus(500).json(error);
+  //   });
+  // }
+
+  // radius = radius ? radius : 5;
+  // count = count ? count : 10;
+
+  // let nearbyZipcodes = [];
+
+  // // const start = Date.now();
+
+  // getAllZipcodesAndGeolocations()
+  // .then((zipcodes) => {
+  //   zipcodes.forEach((zipcode) => {
+  //     if (calculateDistance(latitude, longitude, zipcode.latitude, zipcode.longitude) < limit) {
+  //       nearbyZipcodes.push(zipcode.zip);
+  //     }
+  //   });
+
+  //   // const duration = Date.now() - start;
+
+  //   // console.log('nearby zipcodes calculations completed');
+  //   // console.log(nearbyZipcodes);
+  //   // console.log(nearbyZipcodes.length);
+  //   // console.log(duration);
+  // })
+  // .catch((error) => {
+  //   console.log(`/api/listings find nearby zipcodes error: ${error}`);
+  //   res.sendStatus(500).json(error);
+  // });
+
+
+  const results = [];
+
+  // zipcodes = ["92648", "95128"]
+
+  // getListings({ zipcode: { $in: zipcodes } })
+  getListings({ donor_id: { $lte : 20 } })
+  .then((listings) => {
+
+    console.log(listings);
+    // console.log(listings.toObject({ virtuals: true }));
+    // console.log(listings.toJSON({ virtuals: true }));
+
+    res.json(listings);
+
+    // const duration = Date.now() - start;
+
+    // console.log('nearby zipcodes calculations completed');
+    // console.log(nearbyZipcodes);
+    // console.log(nearbyZipcodes.length);
+    // console.log(duration);
+  })
+  .catch((error) => {
+    console.log(`/api/listings find nearby zipcodes error: ${error}`);
+    res.sendStatus(500).json(error);
+  });
+
+});
+
+// 7) get latitude and longitude from zipcode
 
 // 8) createUser?
 router.post("/api/user", (req, res) => {
   // const { id } = req.query;
-  console.log("we made it", req.body)
-  res.send();
+  // console.log("we made it", req.body)
+  // res.send();
 
   createUser()
   .then((results) => {

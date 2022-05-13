@@ -20,7 +20,7 @@ const chatSchema = new mongoose.Schema({
     type: Date
   }
   //mongoose schemas automatically includes a createdAt timestamp which we can use for 'start time'
-});
+}, { timestamps: true });
 chatSchema.index({ chat_id: 1 });
 
 const chatMessageSchema = new mongoose.Schema({

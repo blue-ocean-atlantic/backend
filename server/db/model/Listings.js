@@ -1,39 +1,5 @@
 const mongoose = require('mongoose');
 
-// const tempSchema = new mongoose.Schema({},{strict: false});
-
-// const locationSchema = new mongoose.Schema({
-//   address: {
-//     type: String
-//   },
-//   street: {
-//     type: String
-//   },
-//   state: {
-//     type: String,
-//     minLength: 2,
-//     maxLength: 2
-//   },
-//   street: {
-//     type: String
-//   },
-//   zipcode: {
-//     type: String,
-//     minLength: 5,
-//     maxLength: 5,
-//     required: true
-//     // type: Number,
-//     // min: 501,
-//     // max: 99950,
-//   },
-//   longitute: {
-//     type: Number
-//   },
-//   latitude: {
-//     type: Number
-//   }
-// });
-
 const listingSchema = new mongoose.Schema({
   listing_id: {
     type: Number,
@@ -42,7 +8,8 @@ const listingSchema = new mongoose.Schema({
   },
   donor_id: { //references user_id //the creator of the listing
     type: Number,
-    required: true
+    required: true,
+    ref: 'users'
   },
   receiver_id: { //references user_id //the receiver of the listing // only updated by donor when they mark the listing as completed.
     type: Number,
@@ -91,8 +58,11 @@ const listingSchema = new mongoose.Schema({
   },
   completed_time: {
     type: Date
-  }
-}, {toJSON: {virtuals: true}});
+  },
+}, {
+  toJSON: { virtuals: true },
+  timestamps: true
+});
 
 listingSchema.index({ listing_id: 1, zipcode: 1});
 
@@ -104,3 +74,41 @@ listingSchema.virtual('donor', {
 
 const Listings = mongoose.model('listings', listingSchema);
 module.exports = Listings;
+
+
+
+// const tempSchema = new mongoose.Schema({},{strict: false});
+
+// const locationSchema = new mongoose.Schema({
+//   address: {
+//     type: String
+//   },
+//   street: {
+//     type: String
+//   },
+//   state: {
+//     type: String,
+//     minLength: 2,
+//     maxLength: 2
+//   },
+//   street: {
+//     type: String
+//   },
+//   zipcode: {
+//     type: String,
+//     minLength: 5,
+//     maxLength: 5,
+//     required: true
+//     // type: Number,
+//     // min: 501,
+//     // max: 99950,
+//   },
+//   longitute: {
+//     type: Number
+//   },
+//   latitude: {
+//     type: Number
+//   }
+// });
+
+

@@ -49,8 +49,8 @@ const usersSchema = new mongoose.Schema({
   },
   ratings: {
     type: [Number]
-  }
-}, {toJSON: {virtuals: true}});
+  },
+}, { toJSON: {virtuals: true}, timestamps: true });
 usersSchema.index({ user_id: 1 });
 
 // usersSchema.virtual('ratingDetails', {
