@@ -9,6 +9,7 @@ const getReceivedListings = require('./getReceivedListings');
 const getListingDetails = require('./getListingDetails');
 const createUser = require('./createUser');
 const authUser = require('../../authentication/models/user.js');
+const checkUsername = require('./checkUsername');
 const authSession = require('../../authentication/models/model.js');
 const authModel = require('../../authentication/models/model.js');
 
@@ -23,6 +24,7 @@ module.exports = {
   getReceivedListings,
   getListingDetails,
   createUser,
+  checkUsername,
   authUser,
   authSession,
   authModel,
