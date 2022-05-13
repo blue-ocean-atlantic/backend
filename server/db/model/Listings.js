@@ -46,7 +46,7 @@ const listingSchema = new mongoose.Schema({
     maxLength: 5,
     required: true
   },
-  longitute: {
+  longitude: {
     type: Number
   },
   latitude: {
