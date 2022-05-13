@@ -53,6 +53,27 @@ async function addDummyData () {
     await Users.insertMany(usersData);
     await Appointments.insertMany(appointmentsData);
     await Zipcodes.insertMany(zipcodesData);
+
+    const userRatings = {};
+
+    ratingsData.forEach((rating) => {
+      if (userRatings[rating.rated_for]) {
+        userRatings[rating.rated_for].push(rating.rating);
+      } else {
+        userRatings[rating.rated_for] = [rating.rating];
+      }
+    });
+
+    const loadUserRatingsPromises = [];
+
+    for (const user_id in userRatings) {
+      loadUserRatingsPromises.push(Users.findOneAndUpdate({user_id}, {ratings: userRatings[user_id]}).exec());
+    }
+
+    await Promise.all(loadUserRatingsPromises);
+
+    // console.log(userRatings);
+
     console.log('data loading complete!');
     process.exit();
   } catch (err) {
