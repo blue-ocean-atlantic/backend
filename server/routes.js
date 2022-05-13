@@ -163,8 +163,8 @@ router.get("/api/listings/landing", (req, res) => {
 });
 
 // 1) getUserInfo
-router.get("/api/user", (req, res) => {
-  const { id } = req.query;
+router.get("/api/user/:id", (req, res) => {
+  const { id } = req.params;
   getUserInfo(id)
   .then((results) => {
     res.send(results)
@@ -176,8 +176,8 @@ router.get("/api/user", (req, res) => {
 });
 
 // 2) getActiveListings
-router.get("/api/listings/active", (req, res) => {
-  const { donor_id } = req.query;
+router.get("/api/listings/active/:donor_id", (req, res) => {
+  const { donor_id } = req.params;
   getActiveListings(donor_id)
   .then((results) => {
     res.send(results)
@@ -189,8 +189,8 @@ router.get("/api/listings/active", (req, res) => {
 });
 
 // 3) getCompletedListings
-router.get("/api/listings/completed", (req, res) => {
-  const { donor_id } = req.query;
+router.get("/api/listings/completed/:donor_id", (req, res) => {
+  const { donor_id } = req.params;
 
   getCompletedListings(donor_id)
   .then((results) => {
@@ -203,8 +203,8 @@ router.get("/api/listings/completed", (req, res) => {
 });
 
 // 4) getReceivedListings
-router.get("/api/listings/received", (req, res) => {
-  const { receiver_id } = req.query;
+router.get("/api/listings/received/:receiver_id", (req, res) => {
+  const { receiver_id } = req.params;
 
   getReceivedListings(receiver_id)
   .then((results) => {
@@ -217,8 +217,8 @@ router.get("/api/listings/received", (req, res) => {
 });
 
 // 5) getListingDetails
-router.get("/api/listing", (req, res) => {
-  const { id } = req.query;
+router.get("/api/listing/:id", (req, res) => {
+  const { id } = req.params;
 
   getListingDetails(id)
   .then((results) => {
