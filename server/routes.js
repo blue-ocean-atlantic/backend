@@ -20,6 +20,7 @@ const {
 const { getAllZipcodesAndGeolocations, getLongAndLatFrom } = require('./db/controllers/Zipcodes');
 const { getListings, getListingsAndDonors, createNewListing, getNextListingId, updateListing } = require('./db/controllers/Listings');
 const { createNewUser, getNextUserId, updateUser } = require('./db/controllers/Users');
+const { getAppointments, createNewAppointment, getNextAppointmentId, updateAppointment } = require('./db/controllers/Appointments');;
 const { calculateDistance } = require('./utils');
 
 
@@ -460,7 +461,69 @@ router.put("/api/listing/:listing_id/completed", (req, res) => {
   });
 });
 
-// 13) checkUsername
+// 13) create a new appointment
+router.post("/api/appointment", (req, res) => {
+  const {
+    donor_id,
+    receiver_id,
+    listing_id,
+    time
+  } = req.body;
+
+  const newAppointmentParams = {
+    donor_id,
+    receiver_id,
+    listing_id,
+    time
+  };
+
+  getNextAppointmentId()
+  .then((result) => {
+    let appointment_id = result.appointment_id || 0;
+    newAppointmentParams.appointment_id = appointment_id + 1;
+    return createNewAppointment(newAppointmentParams);
+  })
+  .then((result) => {
+    res.status(201).json(result);
+  })
+  .catch((error) => {
+    console.log(`Error creating a new appointment at express app: ${error}`);
+    res.status(500).json(error);
+  });
+});
+
+// 14) update an appointment - NOT YET READY
+router.put("/api/appointment/:appointment_id", (req, res) => {
+  const { appointment_id } = req.params;
+
+  // const { donor_id, receiver_id, listing_id, time } = req.body;
+  // let updateParams = { donor_id, receiver_id, listing_id, time };
+
+  updateAppointment(listing_id, req.body)
+  .then((result) => {
+    res.json(result);
+  })
+  .catch((error) => {
+    console.log(`Error updating appointment (id: ${appointment_id} ) at express app: ${error}`);
+    res.status(500).json(error);
+  });
+});
+
+// 15) get appointments of a user
+router.get("/api/appointments/user/:user_id", (req, res) => {
+  const { user_id } = req.params;
+
+  getAppointments(user_id)
+  .then((results) => {
+    res.json(results)
+  })
+  .catch((error) => {
+    console.log(`Error getting appointments for (user_id: ${user_id} ) at express app: ${error}`);
+    res.status(500).json(error);
+  });
+});
+
+// 16) checkUsername
 router.get("/api/username", (req, res) => {
   const { username } = req.query;
 
