@@ -18,9 +18,9 @@ const {
   authModel,
 } = require("./db/controllers");
 const { getAllZipcodesAndGeolocations, getLongAndLatFrom } = require('./db/controllers/Zipcodes');
-const { getListings } = require('./db/controllers/Listings');
+const { getListings, getListingsAndDonors, createNewListing, getNextListingId, updateListing } = require('./db/controllers/Listings');
+const { createNewUser, getNextUserId, updateUser } = require('./db/controllers/Users');
 const { calculateDistance } = require('./utils');
-
 
 
 /* === Authentication Routes === */
@@ -230,158 +230,237 @@ router.get("/api/listing", (req, res) => {
 });
 
 // 6) getListings
-router.get("/api/listings", (req, res) => {
-  const { zipcode, latitude, longitude, radius, count } = req.query;
+router.get("/api/listings", async function (req, res) {
+  const { zipcode } = req.query;
+  let { query, longitude, latitude, radius, count } = req.query;
 
-  // if (!zipcode) {
-  //   res.json([]);
-  // }
+  if (!zipcode) {
+    res.json([]);
+  }
 
-  // if (!latitude && !longitude) {
-  //   getLongAndLatFrom(zipcode)
-  //   .then((response) => {
-  //     console.log(response);
-  //     latitude = response.latitude;
-  //     longitude = response.longitude;
-  //   })
-  //   .catch((error) => {
-  //     console.log(`/api/listings get longitude and latitude error: ${error}`);
-  //     res.sendStatus(500).json(error);
-  //   });
-  // }
+  const start = Date.now();
 
-  // radius = radius ? radius : 5;
-  // count = count ? count : 10;
+  if (!latitude && !longitude) {
+    try {
+      let response =  await getLongAndLatFrom(zipcode);
+      latitude = response.latitude;
+      longitude = response.longitude;
+    } catch(error) {
+      console.log(`/api/listings get longitude and latitude error: ${error}`);
+      res.status(500).json(error);
+    };
+  }
 
-  // let nearbyZipcodes = [];
+  radius = radius || 5;
+  count = count || 10;
+  query = query || '';
 
-  // // const start = Date.now();
+  const nearbyZipcodes = [];
+  const nearbyZipcodesDistances = {};
 
-  // getAllZipcodesAndGeolocations()
-  // .then((zipcodes) => {
-  //   zipcodes.forEach((zipcode) => {
-  //     if (calculateDistance(latitude, longitude, zipcode.latitude, zipcode.longitude) < limit) {
-  //       nearbyZipcodes.push(zipcode.zip);
-  //     }
-  //   });
+  try {
+    const allZipCodes = await getAllZipcodesAndGeolocations();
 
-  //   // const duration = Date.now() - start;
+    allZipCodes.forEach((zipcode) => {
+      let distance = calculateDistance(latitude, longitude, zipcode.latitude, zipcode.longitude);
+      if ( distance < radius) {
+        nearbyZipcodes.push(zipcode.zip);
+        nearbyZipcodesDistances[zipcode.zip] = distance;
+      }
+    });
+  } catch(error) {
+    console.log(`/api/listings find nearby zipcodes error: ${error}`);
+    res.status(500).json(error);
+  };
 
-  //   // console.log('nearby zipcodes calculations completed');
-  //   // console.log(nearbyZipcodes);
-  //   // console.log(nearbyZipcodes.length);
-  //   // console.log(duration);
-  // })
-  // .catch((error) => {
-  //   console.log(`/api/listings find nearby zipcodes error: ${error}`);
-  //   res.sendStatus(500).json(error);
-  // });
+  const returnListings = [];
+  const listingFields = 'listing_id type title description images_urls zipcode latitude longitude donor_id -_id'
+  const donorOptions = 'user_id email photo_url -_id';
 
-
-  const results = [];
-
-  // zipcodes = ["92648", "95128"]
-
-  // getListings({ zipcode: { $in: zipcodes } })
-  getListings({ donor_id: { $lte : 20 } })
+  getListingsAndDonors({
+    $and:
+    [ { $or: //search by query string
+        [ { title: { $regex: query, $options: 'i' } }, { description: { $regex: query, $options: 'i' } }]
+      },
+      { zipcode: { $in: nearbyZipcodes }
+    }] }, listingFields, donorOptions)
   .then((listings) => {
 
-    console.log(listings);
-    // console.log(listings.toObject({ virtuals: true }));
-    // console.log(listings.toJSON({ virtuals: true }));
+    listings.forEach((listing) => {
 
-    res.json(listings);
+      listing = listing.toObject();
 
-    // const duration = Date.now() - start;
+      listing.image_url = listing.images_urls.length > 0 ? listing.images_urls[0] : '';
+      listing.donor_email = listing.donor[0].email;
+      listing.donor_avatar_url = listing.donor[0].photo_url;
+      listing.distance = nearbyZipcodesDistances[listing.zipcode];
 
-    // console.log('nearby zipcodes calculations completed');
-    // console.log(nearbyZipcodes);
-    // console.log(nearbyZipcodes.length);
-    // console.log(duration);
+      delete listing.images_urls;
+      delete listing.donor;
+      delete listing.id;
+
+      returnListings.push(listing);
+    });
+
+    //sort by distance from closest to furthest
+    returnListings.sort((a, b) => a.distance - b.distance);
+
+    const duration = Date.now() - start;
+    console.log(`/api/listings duration = ${duration}ms`);
+
+    res.json(returnListings.slice(0, count));
   })
   .catch((error) => {
-    console.log(`/api/listings find nearby zipcodes error: ${error}`);
-    res.sendStatus(500).json(error);
+    console.log(`/api/listings get listings and their donors error: ${error}`);
+    res.status(500).json(error);
   });
 
 });
 
 // 7) get latitude and longitude from zipcode
 
-// 8) createUser?
+// 8) create a new user
 router.post("/api/user", (req, res) => {
-  // const { id } = req.query;
-  // console.log("we made it", req.body)
-  // res.send();
+  const {
+    first_name,
+    last_name,
+    username,
+    password,
+    email,
+    zipcode
+  } = req.body;
 
-  createUser()
-  .then((results) => {
-    res.send(results)
+  const newUserParams = {
+    first_name,
+    last_name,
+    username,
+    password,
+    email,
+    zipcode
+  };
+
+  getNextUserId()
+  .then((result) => {
+    let user_id = result.user_id || 0;
+    newUserParams.user_id = user_id + 1;
+    return createNewUser(newUserParams);
   })
-  .catch((err) => {
-    console.log('something broke while getting landing', err);
-    res.send(err);
+  .then((result) => {
+    res.status(201).json(result);
+  })
+  .catch((error) => {
+    console.log(`Error creating a new user at express app: ${error}`);
+    res.status(500).json(error);
   });
 });
 
-// 9) createPost
-router.post("/las", (req, res) => {
+// 9) create a new listing
+router.post("/api/listing", async function (req, res) {
   const {
-    user_id,
+    donor_id,
+    type,
     title,
     description,
+    available_date,
+    zipcode
+  } = req.body;
+  let { images_urls, category, condition, longitude, latitude } = req.body;
+
+  category = category || '';
+  condition = condition || '';
+  images_urls = images_urls || [];
+
+  if (!latitude && !longitude) {
+    try {
+      let response =  await getLongAndLatFrom(zipcode);
+      latitude = response.latitude;
+      longitude = response.longitude;
+    } catch(error) {
+      console.log(`POST /api/listing get longitude and latitude error: ${error}`);
+      res.status(500).json(error);
+    };
+  }
+
+  const newListingParams = {
+    donor_id,
     type,
-    images,
-    available_date } = req.body;
+    title,
+    description,
+    available_date,
+    images_urls,
+    zipcode,
+    longitude,
+    latitude,
+    category,
+    condition
+  };
 
-  createPost(user_id, title, description, type, images, available_date)
-  .then((results) => {
-    console.log(results);
-    req.send(results)
+  getNextListingId()
+  .then((result) => {
+    let listing_id = result.listing_id || 0;
+    newListingParams.listing_id = listing_id + 1;
+    return createNewListing(newListingParams);
   })
-  .catch((err) => {
-    console.log('something went wrong in createPost');
-    res.send(err);
+  .then((result) => {
+    res.status(201).json(result);
   })
+  .catch((error) => {
+    console.log(`Error creating a new listing at express app: ${error}`);
+    res.status(500).json(error);
+  });
 
 });
 
-// 10) ??
-router.put("/api/user", (req, res) => {
-  const { id } = req.query;
-  console.log("we made it", req.body)
-  res.send();
-  console.log('made it into 10 put')
+// 10) update user
+router.put("/api/user/:user_id", (req, res) => {
+  const { user_id } = req.params;
 
-  // createUser()
-  // .then((results) => {
-  //   res.send(results)
-  // })
-  // .catch((err) => {
-  //   console.log('something broke while getting landing', err);
-  //   res.send(err);
-  // });
+  updateUser(user_id, req.body)
+  .then((result) => {
+    res.json(result);
+  })
+  .catch((error) => {
+    console.log(`Error updating user (id: ${user_id} ) at express app: ${error}`);
+    res.status(500).json(error);
+  });
 });
 
-// 11) ??
-router.put("/api/listing", (req, res) => {
-  const { id } = req.query;
-  console.log("we made it", req.body)
-  res.send();
+// 11) update listing
+router.put("/api/listing/:listing_id", (req, res) => {
+  const { listing_id } = req.params;
 
-  console.log('inside route 11');
-
-  // createUser()
-  // .then((results) => {
-  //   res.send(results)
-  // })
-  // .catch((err) => {
-  //   console.log('something broke while getting landing', err);
-  //   res.send(err);
-  // });
+  updateListing(listing_id, req.body)
+  .then((result) => {
+    res.json(result);
+  })
+  .catch((error) => {
+    console.log(`Error updating listing (id: ${listing_id} ) at express app: ${error}`);
+    res.status(500).json(error);
+  });
 });
 
-// 12) checkUsername
+// 12) mark listing as completed
+router.put("/api/listing/:listing_id/completed", (req, res) => {
+  const { listing_id } = req.params;
+  const { receiver_id, completed_time } = req.body;
+
+  if (!receiver_id || !completed_time) {
+    res.status(500).json('Error: Listing cannot be marked as complete. Missing/invalid parameter(s).');
+  }
+
+  let updateParams = { receiver_id, completed_time, completed: true };
+
+  updateListing(listing_id, updateParams)
+  .then((result) => {
+    res.json(result);
+  })
+  .catch((error) => {
+    console.log(`Error updating listing (id: ${listing_id} ) at express app: ${error}`);
+    res.status(500).json(error);
+  });
+});
+
+// 13) checkUsername
 router.get("/api/username", (req, res) => {
   const { username } = req.query;
 

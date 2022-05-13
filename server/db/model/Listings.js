@@ -60,11 +60,13 @@ const listingSchema = new mongoose.Schema({
     type: Date
   },
 }, {
-  toJSON: { virtuals: true },
+  // toJSON: { virtuals: true },
+  toJSON: { getters: true },
+  toObject: { getters: true },
   timestamps: true
 });
 
-listingSchema.index({ listing_id: 1, zipcode: 1});
+listingSchema.index({ listing_id: 1, zipcode: 1 });
 
 listingSchema.virtual('donor', {
   ref: 'users',

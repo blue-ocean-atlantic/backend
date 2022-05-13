@@ -60,5 +60,6 @@ const zipcodeSchema = new mongoose.Schema({
     required: true
   }
 }, { timestamps: true });
+zipcodeSchema.index({ zip: 1 });
 
 module.exports = mongoose.model('zipcodes', zipcodeSchema);
